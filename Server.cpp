@@ -34,6 +34,12 @@ bool Server::acceptClient() {
 	} else if (desc > 0) {
 		client.socketDescriptor = desc;
 		clientsDescriptors.push_back(client);
+		pthread_t * handlingClient = handlingClientsThreads.get_allocator().allocate(1);
+		ServerClientPair * args = new ServerClientPair();
+		args->server = this;
+		args->clientDesc = desc;
+		pthread_create(handlingClient, NULL, handleClient, (void*) args);
+//		pthread_join(*handlingClient, NULL);
 	}
 	return true;
 
@@ -47,5 +53,20 @@ void* Server::acceptingClientsLoop(void* arg) {
 
 void Server::startAcceptingClients() {
 	pthread_create(&acceptingClients, NULL, acceptingClientsLoop, this);
-	pthread_join(acceptingClients, NULL);
+//	pthread_join(acceptingClients, NULL);
+}
+
+void* Server::handleClient(void* arg) {
+	ServerClientPair * pair = (ServerClientPair*) arg;
+	pair->server->sendToClient(pair->clientDesc, "Connected to IRC server.");
+	delete pair;
+	return NULL;
+}
+
+bool Server::sendToClient(int clientDescriptor, string message) {
+	if (-1 == send(clientDescriptor, message.c_str(), message.size(), 0)) {
+		return false;
+	} else {
+		return true;
+	}
 }

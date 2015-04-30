@@ -13,8 +13,10 @@
 #include <unistd.h>
 #include <list>
 #include <pthread.h>
+#include <string>
 
 using std::list;
+using std::string;
 
 struct Client {
 	sockaddr_in clientAddress;
@@ -32,9 +34,11 @@ private:
 	list<Client> clientsDescriptors;
 
 	pthread_t acceptingClients;
+	list<pthread_t> handlingClientsThreads;
 
 	bool initServerSocketDescriptor();
 	static void * acceptingClientsLoop(void * arg);
+	static void * handleClient(void * arg);
 public:
 	Server(int port);
 	virtual ~Server();
@@ -45,7 +49,13 @@ public:
 
 	bool acceptClient();
 	void startAcceptingClients();
+	bool sendToClient(int clientDescriptor, string message);
 
+};
+
+struct ServerClientPair {
+	Server * server;
+	int clientDesc;
 };
 
 #endif /* SERVER_H_ */
