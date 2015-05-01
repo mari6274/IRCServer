@@ -27,18 +27,18 @@ Server::~Server() {
 }
 
 bool Server::acceptClient() {
-	Client client;
-	int desc = accept(serverSocketDescriptor, (sockaddr*) &client.clientAddress, &client.socketLength);
+	Client * client = new Client();
+	int desc = accept(serverSocketDescriptor, (sockaddr*) &client->clientAddress, &client->socketLength);
 	if (-1 == desc) {
+		delete client;
 		return false;
 	} else if (desc > 0) {
-		client.socketDescriptor = desc;
-		clientsDescriptors.push_back(client);
-		pthread_t * handlingClient = handlingClientsThreads.get_allocator().allocate(1);
+		clients.push_back(client);
+		client->socketDescriptor = desc;
 		ServerClientPair * args = new ServerClientPair();
 		args->server = this;
 		args->clientDesc = desc;
-		pthread_create(handlingClient, NULL, handleClient, (void*) args);
+		pthread_create(&client->thread, NULL, handleClient, (void*) args);
 //		pthread_join(*handlingClient, NULL);
 	}
 	return true;
@@ -63,7 +63,7 @@ void* Server::handleClient(void* arg) {
 	return NULL;
 }
 
-bool Server::sendToClient(int clientDescriptor, string message) {
+bool Server::sendToClient(int clientDescriptor, string message) const {
 	if (-1 == send(clientDescriptor, message.c_str(), message.size(), 0)) {
 		return false;
 	} else {

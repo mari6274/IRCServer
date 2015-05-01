@@ -14,15 +14,10 @@
 #include <list>
 #include <pthread.h>
 #include <string>
+#include "Client.h"
 
 using std::list;
 using std::string;
-
-struct Client {
-	sockaddr_in clientAddress;
-	socklen_t socketLength;
-	int socketDescriptor;
-};
 
 class Server {
 private:
@@ -31,10 +26,9 @@ private:
 	int serverSocketDescriptor;
 	bool initializedSocket;
 
-	list<Client> clientsDescriptors;
+	list<Client*> clients;
 
 	pthread_t acceptingClients;
-	list<pthread_t> handlingClientsThreads;
 
 	bool initServerSocketDescriptor();
 	static void * acceptingClientsLoop(void * arg);
@@ -49,7 +43,7 @@ public:
 
 	bool acceptClient();
 	void startAcceptingClients();
-	bool sendToClient(int clientDescriptor, string message);
+	bool sendToClient(int clientDescriptor, string message) const;
 
 };
 
