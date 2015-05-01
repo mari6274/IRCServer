@@ -15,6 +15,7 @@
 #include <pthread.h>
 #include <string>
 #include "Client.h"
+#include <iostream>
 
 using std::list;
 using std::string;
@@ -44,6 +45,7 @@ public:
 	bool acceptClient();
 	void startAcceptingClients();
 	bool sendToClient(int clientDescriptor, string message) const;
+	string receiveFromClient(int clientDescriptor) const;
 
 };
 

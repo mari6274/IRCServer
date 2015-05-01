@@ -59,6 +59,11 @@ void Server::startAcceptingClients() {
 void* Server::handleClient(void* arg) {
 	ServerClientPair * pair = (ServerClientPair*) arg;
 	pair->server->sendToClient(pair->clientDesc, "Connected to IRC server.");
+	while (true) {
+		string receivedCommand = pair->server->receiveFromClient(pair->clientDesc);
+		std::cout << receivedCommand << std::endl;
+	}
+
 	delete pair;
 	return NULL;
 }
@@ -69,4 +74,26 @@ bool Server::sendToClient(int clientDescriptor, string message) const {
 	} else {
 		return true;
 	}
+}
+
+string Server::receiveFromClient(int clientDescriptor) const {
+	string buffer;
+	char c;
+	do {
+		int retv = recv(clientDescriptor, &c, 1, 0);
+		if (-1 != retv) {
+			if (c == '\r') {
+				recv(clientDescriptor, &c, 1, 0);
+				if (c == '\n') {
+					break;
+				}
+			} else {
+				buffer += c;
+			}
+		} else {
+			return "";
+		}
+	} while (true);
+
+	return buffer;
 }
