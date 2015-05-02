@@ -52,6 +52,7 @@ bool CommandParser::parse(string command, Client* client) {
 				return false;
 			}
 		}
+		error = "Command not recognized";
 		return false;
 	} else {
 		error = "Empty command";

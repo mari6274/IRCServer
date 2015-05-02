@@ -7,16 +7,25 @@
 
 #include <iostream>
 #include "Server.h"
+#include <signal.h>
 
 using std::cout;
 using std::endl;
 using std::cin;
 using std::string;
 
+Server * server;
+
+void sigint(int signum) {
+	server->stopAcceptingClients();
+	server->stopHandlingClients();
+	exit(0);
+}
 
 int main(int argc, char **argv) {
-	Server * server = new Server(6666);
+	server = new Server(6666);
 	if (server->isInitializedSocket()) {
+		signal(SIGINT, sigint);
 		cout << "Socket initialized" << endl;
 		server->startAcceptingClients();
 		string in;

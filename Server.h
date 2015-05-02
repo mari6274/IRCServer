@@ -17,6 +17,7 @@
 #include "Client.h"
 #include "CommandParser.h"
 #include <iostream>
+#include <signal.h>
 
 using std::list;
 using std::string;
@@ -45,6 +46,8 @@ public:
 
 	bool acceptClient();
 	void startAcceptingClients();
+	void stopAcceptingClients();
+	void stopHandlingClients();
 	bool sendToClient(int clientDescriptor, string message) const;
 	string receiveFromClient(int clientDescriptor) const;
 

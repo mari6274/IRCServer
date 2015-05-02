@@ -69,6 +69,7 @@ void* Server::handleClient(void* arg) {
 			server->sendToClient(client->socketDescriptor, parser.getError() + "\r\n");
 		}
 	}
+	server->sendToClient(client->socketDescriptor, "Welcome to IRCServer " + client->getNick() + "!\r\n");
 
 	delete pair;
 	return NULL;
@@ -79,6 +80,18 @@ bool Server::sendToClient(int clientDescriptor, string message) const {
 		return false;
 	} else {
 		return true;
+	}
+}
+
+void Server::stopAcceptingClients() {
+	pthread_kill(acceptingClients, SIGKILL);
+}
+
+void Server::stopHandlingClients() {
+	list<Client*>::iterator it;
+
+	for (it = clients.begin(); it != clients.end(); ++it) {
+		pthread_kill((*it)->thread, SIGKILL);
 	}
 }
 
