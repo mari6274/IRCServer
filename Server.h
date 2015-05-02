@@ -15,6 +15,7 @@
 #include <pthread.h>
 #include <string>
 #include "Client.h"
+#include "CommandParser.h"
 #include <iostream>
 
 using std::list;
@@ -51,7 +52,7 @@ public:
 
 struct ServerClientPair {
 	Server * server;
-	int clientDesc;
+	Client * client;
 };
 
 #endif /* SERVER_H_ */

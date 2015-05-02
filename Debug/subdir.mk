@@ -4,17 +4,23 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
+../Channel.cpp \
 ../Client.cpp \
+../CommandParser.cpp \
 ../Server.cpp \
 ../main.cpp 
 
 OBJS += \
+./Channel.o \
 ./Client.o \
+./CommandParser.o \
 ./Server.o \
 ./main.o 
 
 CPP_DEPS += \
+./Channel.d \
 ./Client.d \
+./CommandParser.d \
 ./Server.d \
 ./main.d 
 

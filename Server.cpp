@@ -37,7 +37,7 @@ bool Server::acceptClient() {
 		client->socketDescriptor = desc;
 		ServerClientPair * args = new ServerClientPair();
 		args->server = this;
-		args->clientDesc = desc;
+		args->client = client;
 		pthread_create(&client->thread, NULL, handleClient, (void*) args);
 //		pthread_join(*handlingClient, NULL);
 	}
@@ -58,10 +58,16 @@ void Server::startAcceptingClients() {
 
 void* Server::handleClient(void* arg) {
 	ServerClientPair * pair = (ServerClientPair*) arg;
-	pair->server->sendToClient(pair->clientDesc, "Connected to IRC server.");
-	while (true) {
-		string receivedCommand = pair->server->receiveFromClient(pair->clientDesc);
-		std::cout << receivedCommand << std::endl;
+	Server * server = pair->server;
+	Client * client = pair->client;
+	server->sendToClient(client->socketDescriptor, "Connected to IRC server.\r\n");
+
+	CommandParser parser;
+	while (!client->hasNick() || !client->hasRealname() || !client->hasUsername()) {
+		string receivedCommand = pair->server->receiveFromClient(client->socketDescriptor);
+		if (!parser.parse(receivedCommand, client)) {
+			server->sendToClient(client->socketDescriptor, parser.getError() + "\r\n");
+		}
 	}
 
 	delete pair;

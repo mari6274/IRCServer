@@ -24,6 +24,8 @@ int main(int argc, char **argv) {
 			cout << " >>> ";
 			cin >> in;
 		}
+	} else {
+		cout << "Cannot initialize server. Exit." << endl;
 	}
 	delete server;
 }

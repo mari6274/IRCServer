@@ -8,12 +8,9 @@
 #include "Client.h"
 
 Client::Client() {
-	// TODO Auto-generated constructor stub
-
 }
 
 Client::~Client() {
-	// TODO Auto-generated destructor stub
 }
 
 Client& Client::operator =(const Client& client) {
