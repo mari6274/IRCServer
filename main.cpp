@@ -19,6 +19,7 @@ Server * server;
 void sigint(int signum) {
 	server->stopAcceptingClients();
 	server->stopHandlingClients();
+	delete server;
 	exit(0);
 }
 
