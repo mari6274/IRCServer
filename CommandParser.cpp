@@ -35,11 +35,7 @@ bool CommandParser::parse(string command, Client* client) {
 				for (int i = 5; i < v.size(); ++i) {
 					v[4] += " " + v[i];
 				}
-				if (
-						(v[2] == "0" || v[2] == "8") &&
-						v[3] == "*" &&
-						v[4][0] == ':'
-				) {
+				if (v[4][0] == ':') {
 					client->setUsername(v[1]);
 					client->setRealname(v[4].substr(1, v[4].size()-1));
 					return true;

@@ -20,6 +20,7 @@ private:
 	string nick;
 	string username;
 	string realname;
+	string hostname;
 public:
 	sockaddr_in clientAddress;
 	socklen_t socketLength;
@@ -67,6 +68,19 @@ public:
 
 	bool hasUsername() const {
 		if (username == "") return false;
+		else return true;
+	}
+
+	const string& getHostname() const {
+		return hostname;
+	}
+
+	void setHostname(const string& hostname) {
+		this->hostname = hostname;
+	}
+
+	bool hasHostname() const {
+		if (hostname == "") return false;
 		else return true;
 	}
 };
