@@ -7,12 +7,18 @@
 
 #include "Channel.h"
 
-Channel::Channel() {
-	// TODO Auto-generated constructor stub
-
+Channel::Channel(const string & name, const string & topic) {
+	this->name = name;
+	this->topic = topic;
 }
 
 Channel::~Channel() {
-	// TODO Auto-generated destructor stub
 }
 
+void Channel::addClient(Client* client) {
+	clients[client->getNick()] = client;
+}
+
+void Channel::removeClient(Client* client) {
+	clients.erase(client->getNick());
+}

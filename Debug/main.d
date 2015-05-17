@@ -1,7 +1,10 @@
-main.d: ../main.cpp ../Server.h ../Client.h ../CommandParser.h
+main.d: ../main.cpp ../Server.h ../Client.h ../IrcProtocolParser.h \
+ ../Channel.h
 
 ../Server.h:
 
 ../Client.h:
 
-../CommandParser.h:
+../IrcProtocolParser.h:
+
+../Channel.h:

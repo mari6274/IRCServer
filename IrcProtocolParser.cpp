@@ -1,0 +1,150 @@
+/*
+ * CommandParser.cpp
+ *
+ *  Created on: 02-05-2015
+ *      Author: mario
+ */
+
+#include "IrcProtocolParser.h"
+
+IrcProtocolParser::IrcProtocolParser(Server * server, Client * client) {
+	this->server = server;
+	this->client = client;
+}
+
+void IrcProtocolParser::parse(const string & command) {
+	stringstream ss(command);
+	vector<string> v;
+	while (ss) {
+		string part;
+		ss >> part;
+		v.push_back(part);
+	}
+	v.pop_back();
+
+
+	if (v.size() != 0) {
+		if (lowerCase(v[0]) == "join") {
+			if (v.size() >= 2) {
+				for (int i = 1; i < v.size(); ++i) {
+					if (!server->joinChannel(v[i], client)) {
+						server->createChannel(v[i], "");
+						server->joinChannel(v[i], client);
+					}
+				}
+				return;
+			} else {
+				server->sendToClient(client->socketDescriptor, server->getPrefix("461", client) + "JOIN :Not enough parameters");
+				return;
+			}
+		}
+
+		if (lowerCase(v[0]) == "part") {
+			if (v.size() >= 2) {
+				for (int i = 1; i < v.size(); ++i) {
+					server->partChannel(v[i], client);
+				}
+				return;
+			} else {
+				server->sendToClient(client->socketDescriptor, server->getPrefix("461", client) + "JOIN :Not enough parameters");
+				return;
+			}
+		}
+
+		if (lowerCase(v[0]) == "privmsg") {
+			if (v.size() >= 3) {
+				if (v[2][0] == ':') {
+					for (int i = 3; i < v.size(); ++i) {
+						v[2] += " " + v[i];
+					}
+				}
+				if (v[1][0] == '#') {
+					server->sendToChannel(v[1], client->socketDescriptor, v[2]);
+				} else {
+					server->sendToClient(v[1], v[2]);
+				}
+			} else {
+				server->sendToClient(client->socketDescriptor, server->getPrefix("461", client) + "PRIVMSG :Not enough parameters");
+				return;
+			}
+		}
+
+		if (lowerCase(v[0]) == "list") {
+			server->sendToClient(client->socketDescriptor, server->getPrefix("321", client) + "Channel :Users Name");
+			for (map<string, Channel*>::iterator it = server->channels.begin(); it != server->channels.end(); ++it) {
+				stringstream ss;
+				ss << it->second->getClients().size();
+				server->sendToClient(client->socketDescriptor, server->getPrefix("322", client) + it->first + " " + ss.str() + " :" + it->second->getTopic());
+			}
+			server->sendToClient(client->socketDescriptor, server->getPrefix("323", client) + ":End of /LIST");
+			return;
+		}
+
+		if (lowerCase(v[0]) == "help") {
+			if (v.size() == 1) {
+				server->sendToClient(client->socketDescriptor, server->getPrefix("704", client) + "index :Help topics available to users:");
+				server->sendToClient(client->socketDescriptor, server->getPrefix("705", client) + "index :");
+				server->sendToClient(client->socketDescriptor, server->getPrefix("705", client) + "index :NICK\t\tQUIT\t\tLIST\t\tJOIN");
+				server->sendToClient(client->socketDescriptor, server->getPrefix("705", client) + "index :NAMES\t\tWHO\t\tPART\t\tPRIVMSG");
+				server->sendToClient(client->socketDescriptor, server->getPrefix("705", client) + "index :HELP\t\tUSER");
+				server->sendToClient(client->socketDescriptor, server->getPrefix("705", client) + "index :");
+				server->sendToClient(client->socketDescriptor, server->getPrefix("706", client) + "index :End of /HELP.");
+				return;
+			} else {
+				server->sendToClient(client->socketDescriptor, server->getPrefix("524", client) + ":Help not found");
+				return;
+			}
+		}
+
+		if (lowerCase(v[0]) == "quit") {
+			server->stopHandlingClient(client);
+			return;
+		}
+	}
+}
+
+void IrcProtocolParser::parseNickUser(const string& command) {
+	stringstream ss(command);
+	vector<string> v;
+	while (ss) {
+		string part;
+		ss >> part;
+		v.push_back(part);
+	}
+	v.pop_back();
+
+	if (v.size() != 0) {
+		if (lowerCase(v[0]) == "nick") {
+			if (v.size() >= 2) {
+				client->setNick(v[1]);
+			} else {
+				server->sendToClient(client->socketDescriptor, server->getPrefix("461", client) + "NICK :Not enough parameters");
+			}
+		}
+
+		if (lowerCase(v[0]) == "user") {
+			if (v.size() >= 5) {
+				if (v[4][0] == ':') {
+					for (int i = 5; i < v.size(); ++i) {
+						v[4] += " " + v[i];
+					}
+				}
+				client->setUsername(v[1]);
+				client->setRealname(v[4].substr(1, v[4].size()-1));
+			} else {
+				server->sendToClient(client->socketDescriptor, server->getPrefix("461", client) + "USER :Not enough parameters");
+			}
+		}
+	}
+
+}
+
+string IrcProtocolParser::lowerCase(string in) const {
+	transform(in.begin(), in.end(), in.begin(), ::tolower);
+	return in;
+}
+
+
+IrcProtocolParser::~IrcProtocolParser() {
+}
+

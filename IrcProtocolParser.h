@@ -10,6 +10,7 @@
 
 #include <string>
 #include "Client.h"
+#include "Server.h"
 #include <algorithm>
 #include <sstream>
 #include <vector>
@@ -19,19 +20,20 @@ using std::stringstream;
 using std::vector;
 using std::transform;
 
-class CommandParser {
+class Server;
+
+class IrcProtocolParser {
 private:
+	Server * server;
+	Client * client;
+
 	string lowerCase(string in) const;
-	string error;
 public:
-	bool parse(string command, Client * client);
+	void parse(const string & command);
+	void parseNickUser(const string & command);
 
-	CommandParser();
-	virtual ~CommandParser();
-
-	const string& getError() const {
-		return error;
-	}
+	IrcProtocolParser(Server * server, Client * client);
+	virtual ~IrcProtocolParser();
 };
 
 #endif /* COMMANDPARSER_H_ */

@@ -6,21 +6,21 @@
 CPP_SRCS += \
 ../Channel.cpp \
 ../Client.cpp \
-../CommandParser.cpp \
+../IrcProtocolParser.cpp \
 ../Server.cpp \
 ../main.cpp 
 
 OBJS += \
 ./Channel.o \
 ./Client.o \
-./CommandParser.o \
+./IrcProtocolParser.o \
 ./Server.o \
 ./main.o 
 
 CPP_DEPS += \
 ./Channel.d \
 ./Client.d \
-./CommandParser.d \
+./IrcProtocolParser.d \
 ./Server.d \
 ./main.d 
 

@@ -24,10 +24,13 @@ void sigint(int signum) {
 }
 
 int main(int argc, char **argv) {
-	server = new Server(6666);
+	server = new Server(6667);
 	if (server->isInitializedSocket()) {
 		signal(SIGINT, sigint);
 		cout << "Socket initialized" << endl;
+
+		server->createChannel("SIK", "Kanał uczestników zajęć z Sieci Komputerowych.");
+
 		server->startAcceptingClients();
 		string in;
 		while (in != "q") {
