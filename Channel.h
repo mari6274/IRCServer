@@ -26,7 +26,7 @@ public:
 	void addClient(Client * client);
 	void removeClient(Client * client);
 
-	const map<string, Client*>& getClients() const {
+	map<string, Client*>& getClients() {
 		return clients;
 	}
 

@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
 		signal(SIGINT, sigint);
 		cout << "Socket initialized" << endl;
 
-		server->createChannel("SIK", "Kanał uczestników zajęć z Sieci Komputerowych.");
+		server->createChannel("#SIK", "Kanał uczestników zajęć z Sieci Komputerowych.");
 
 		server->startAcceptingClients();
 		string in;

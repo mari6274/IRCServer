@@ -20,3 +20,7 @@ Client& Client::operator =(const Client& client) {
 	thread = client.thread;
 	return *this;
 }
+
+string Client::getPrefix() const {
+	return ":" + nick + "!" + username + "@" + hostname + " ";
+}

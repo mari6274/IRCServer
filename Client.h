@@ -32,6 +32,8 @@ public:
 
 	Client & operator=(const Client & client);
 
+	string getPrefix() const;
+
 	const string& getNick() const {
 		return nick;
 	}
