@@ -96,6 +96,32 @@ void IrcProtocolParser::parse(const string & command) {
 			}
 		}
 
+		if (lowerCase(v[0]) == "who") {
+
+		}
+
+		if (lowerCase(v[0]) == "names") {
+			if (v.size() == 1) {
+				for (map<string, Channel*>::iterator it = server->channels.begin() ; it != server->channels.end(); ++it) {
+					string users;
+					for (map<string, Client*>::iterator it2 = it->second->clients.begin(); it2 != it->second->clients.end(); ++it2) {
+						users += it2->second->nick + " ";
+					}
+					server->sendToClient(client->socketDescriptor, server->getPrefix("353", client) + "= " + it->first + " :" + users);
+					server->sendToClient(client->socketDescriptor, server->getPrefix("366", client) + "* :End of /NAMES");
+				}
+			} else if (server->channels.find(v[1]) != server->channels.end()) {
+				Channel * channel = server->channels.find(v[1])->second;
+				string users;
+				for (map<string, Client*>::iterator it = channel->clients.begin(); it != channel->clients.end(); ++it) {
+					users += it->second->nick + " ";
+				}
+				server->sendToClient(client->socketDescriptor, server->getPrefix("353", client) + "= " + channel->name + " :" + users);
+				server->sendToClient(client->socketDescriptor, server->getPrefix("366", client) + + v[1] + " :End of /NAMES");
+			}
+
+		}
+
 		if (lowerCase(v[0]) == "quit") {
 			server->stopHandlingClient(client);
 			return;
@@ -116,10 +142,16 @@ void IrcProtocolParser::parseNickUser(const string& command) {
 	if (v.size() != 0) {
 		if (lowerCase(v[0]) == "nick") {
 			if (v.size() >= 2) {
-				client->setNick(v[1]);
+				if (server->clients.find(v[1]) != server->clients.end()) {
+					server->sendToClient(client->socketDescriptor, server->getPrefix("433", client) + v[1] + " :Nickname is already in use");
+				} else {
+					client->setNick(v[1]);
+				}
 			} else {
-				server->sendToClient(client->socketDescriptor, server->getPrefix("461", client) + "NICK :Not enough parameters");
+				server->sendToClient(client->socketDescriptor, server->getPrefix("431", client) + ":No nickname given");
 			}
+
+			return;
 		}
 
 		if (lowerCase(v[0]) == "user") {
@@ -134,6 +166,7 @@ void IrcProtocolParser::parseNickUser(const string& command) {
 			} else {
 				server->sendToClient(client->socketDescriptor, server->getPrefix("461", client) + "USER :Not enough parameters");
 			}
+			return;
 		}
 	}
 
