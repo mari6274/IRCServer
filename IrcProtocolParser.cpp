@@ -71,11 +71,23 @@ void IrcProtocolParser::parse(const string & command) {
 
 		if (lowerCase(v[0]) == "list") {
 			server->sendToClient(client->socketDescriptor, server->getPrefix("321", client) + "Channel :Users Name");
-			for (map<string, Channel*>::iterator it = server->channels.begin(); it != server->channels.end(); ++it) {
-				stringstream ss;
-				ss << it->second->getClients().size();
-				server->sendToClient(client->socketDescriptor, server->getPrefix("322", client) + it->first + " " + ss.str() + " :" + it->second->getTopic());
+			if (v.size() == 1) {
+				for (map<string, Channel*>::iterator it = server->channels.begin(); it != server->channels.end(); ++it) {
+					stringstream ss;
+					ss << it->second->getClients().size();
+					server->sendToClient(client->socketDescriptor, server->getPrefix("322", client) + it->first + " " + ss.str() + " :" + it->second->getTopic());
+				}
+			} else {
+				if (server->channels.find(v[1]) != server->channels.end()) {
+					Channel * channel = server->channels.find(v[1])->second;
+					stringstream ss;
+					ss << channel->getClients().size();
+					server->sendToClient(client->socketDescriptor, server->getPrefix("322", client) + channel->name + " " + ss.str() + " :" + channel->getTopic());
+				} else {
+					server->sendToClient(client->socketDescriptor, server->getPrefix("322", client) + v[1] + " :No such nick/channel");
+				}
 			}
+
 			server->sendToClient(client->socketDescriptor, server->getPrefix("323", client) + ":End of /LIST");
 			return;
 		}
