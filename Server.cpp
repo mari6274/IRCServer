@@ -194,7 +194,11 @@ string Server::receiveFromClient(int clientDescriptor) const {
 	char c;
 	do {
 		int retv = recv(clientDescriptor, &c, 1, 0);
-		if (-1 != retv) {
+		if (-1 == retv) {
+			return "err";
+		} else if (0 == retv) {
+			return "err";
+		} else {
 			if (c == '\r') {
 				recv(clientDescriptor, &c, 1, 0);
 				if (c == '\n') {
@@ -203,10 +207,9 @@ string Server::receiveFromClient(int clientDescriptor) const {
 			} else {
 				buffer += c;
 			}
-		} else {
-			return "err";
 		}
 	} while (true);
+
 
 	return buffer;
 }
