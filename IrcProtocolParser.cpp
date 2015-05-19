@@ -43,7 +43,26 @@ void IrcProtocolParser::parse(const string & command) {
 		}
 
 		if (lowerCase(v[0]) == "topic") {
-
+			if (v.size() >= 3) {
+				if (server->channels.find(v[1]) != server->channels.end()) {
+					if (server->channels[v[1]]->getClients().find(client->getNick()) != server->channels[v[1]]->getClients().end()) {
+						if (v[2][0] == ':') {
+							for (int i = 3; i < v.size(); ++i) {
+								v[2] += " " + v[i];
+							}
+						}
+						server->channels[v[1]]->setTopic(v[2]);
+						server->sendToChannel(v[1], client->socketDescriptor, client->getPrefix() + "TOPIC " + v[1] + " " + v[2]);
+						server->sendToClient(client->getNick(), client->getPrefix() + "TOPIC " + v[1] + " " + v[2]);
+					} else {
+						server->sendToClient(client->getNick(), server->getPrefix("442", client) + v[1] + " :You're not on that channel");
+					}
+				} else {
+					server->sendToClient(client->socketDescriptor, server->getPrefix("403", client) + v[1] + " :No such channel");
+				}
+			} else {
+				server->sendToClient(client->getNick(), server->getPrefix("461", client) + "TOPIC :Not enough parameters");
+			}
 		}
 
 		if (lowerCase(v[0]) == "part") {
