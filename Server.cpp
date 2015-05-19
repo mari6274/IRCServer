@@ -42,6 +42,7 @@ bool Server::acceptClient() {
 		return false;
 	} else if (desc > 0) {
 		client->socketDescriptor = desc;
+		client->setHostname(inet_ntoa(client->clientAddress.sin_addr));
 		ServerClientPair * args = new ServerClientPair();
 		args->server = this;
 		args->client = client;
@@ -71,6 +72,10 @@ void* Server::handleClient(void* arg) {
 	IrcProtocolParser parser(server, client);
 	while (!client->hasNick() || !client->hasRealname() || !client->hasUsername()) {
 		string receivedCommand = pair->server->receiveFromClient(client->socketDescriptor);
+		if (receivedCommand == "err") {
+			delete pair;
+			return NULL;
+		}
 		parser.parseNickUser(receivedCommand);
 	}
 	server->clients[client->getNick()] = client;
@@ -84,6 +89,9 @@ void* Server::handleClient(void* arg) {
 
 	while (true) {
 		string receivedCommand = pair->server->receiveFromClient(client->socketDescriptor);
+		if (receivedCommand == "err") {
+			break;
+		}
 		parser.parse(receivedCommand);
 	}
 
@@ -121,6 +129,7 @@ void Server::stopHandlingClient(Client* client) {
 	}
 	clients.erase(client->getNick());
 	pthread_kill(client->thread, SIGKILL);
+	delete client;
 }
 
 void Server::stopHandlingClients() {
@@ -195,7 +204,7 @@ string Server::receiveFromClient(int clientDescriptor) const {
 				buffer += c;
 			}
 		} else {
-			return "";
+			return "err";
 		}
 	} while (true);
 

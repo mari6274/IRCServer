@@ -43,7 +43,7 @@ public:
 	}
 
 	bool hasNick() const {
-		if (nick == "") return false;
+		if (nick == "" || nick == "*") return false;
 		else return true;
 	}
 
