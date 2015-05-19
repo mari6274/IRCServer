@@ -156,8 +156,12 @@ bool Server::joinChannel(const string& name, Client * client) {
 
 bool Server::partChannel(const string& name, Client* client) {
 	if (channels.find(name) != channels.end()) {
-		channels[name]->removeClient(client);
-		return true;
+		if(channels[name]->getClients().find(client->getNick()) != channels[name]->getClients().end()) {
+			channels[name]->removeClient(client);
+			return true;
+		} else {
+			return false;
+		}
 	} else {
 		return false;
 	}

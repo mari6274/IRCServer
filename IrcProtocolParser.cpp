@@ -31,6 +31,9 @@ void IrcProtocolParser::parse(const string & command) {
 						server->createChannel(v[i], "");
 						server->joinChannel(v[i], client);
 					}
+					server->sendToChannel(v[i], client->socketDescriptor, client->getPrefix() + "JOIN " + v[i]);
+					server->sendToClient(client->getNick(), client->getPrefix() + "JOIN " + v[i]);
+					server->sendToClient(client->getNick(), server->getPrefix("332", client) + v[i] + " :" + server->channels[v[i]]->getTopic());
 				}
 				return;
 			} else {
@@ -39,10 +42,19 @@ void IrcProtocolParser::parse(const string & command) {
 			}
 		}
 
+		if (lowerCase(v[0]) == "topic") {
+
+		}
+
 		if (lowerCase(v[0]) == "part") {
 			if (v.size() >= 2) {
 				for (int i = 1; i < v.size(); ++i) {
-					server->partChannel(v[i], client);
+					if (server->partChannel(v[i], client)) {
+						server->sendToChannel(v[i], client->socketDescriptor, client->getPrefix() + "PART " + v[i]);
+						server->sendToClient(client->getNick(), client->getPrefix() + "PART " + v[i]);
+					} else {
+						server->sendToClient(client->getNick(), server->getPrefix("442", client) + v[i] + " :You're not on that channel");
+					}
 				}
 				return;
 			} else {
