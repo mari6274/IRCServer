@@ -166,7 +166,15 @@ void IrcProtocolParser::parse(const string & command) {
 		}
 
 		if (lowerCase(v[0]) == "who") {
-
+			if (v.size() >= 2) {
+				map<string, Client *>::iterator cl = server->clients.find(v[1]);
+				if (cl != server->clients.end()) {
+					server->sendToClient(client->socketDescriptor, server->getPrefix("352", client) + "* " + cl->second->getUsername() + " " + cl->second->getHostname() + " " + server->serverHost + " " + v[1] + " H :0 " + cl->second->getRealname());
+				}
+				server->sendToClient(client->socketDescriptor, server->getPrefix("315", client) + v[1] + " :End of /WHO");
+			} else {
+				server->sendToClient(client->socketDescriptor, server->getPrefix("461", client) + "WHO :Not enough parameters");
+			}
 		}
 
 		if (lowerCase(v[0]) == "names") {
