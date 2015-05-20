@@ -24,23 +24,34 @@ void sigint(int signum) {
 }
 
 int main(int argc, char **argv) {
-	server = new Server(6667);
-	if (server->isInitializedSocket()) {
-		signal(SIGINT, sigint);
-		cout << "Socket initialized" << endl;
+	if (argc == 3) {
+		stringstream ss;
+		int port;
+		ss << argv[2];
+		ss >> port;
+		if (port != 0) {
+			server = new Server(argv[1], port);
+			if (server->isInitializedSocket()) {
+				signal(SIGINT, sigint);
+				cout << "Socket initialized" << endl;
 
-		server->createChannel("#SIK", "Kanał uczestników zajęć z Sieci Komputerowych.");
+				server->createChannel("#SIK", "Kanał uczestników zajęć z Sieci Komputerowych.");
 
-		server->startAcceptingClients();
-		string in;
-		while (in != "q") {
-			cout << " >>> ";
-			cin >> in;
+				server->startAcceptingClients();
+				string in;
+				while (in != "q") {
+					cout << " >>> ";
+					cin >> in;
+				}
+			} else {
+				cout << "Cannot initialize server. Exit." << endl;
+			}
+			delete server;
+			return 0;
 		}
-	} else {
-		cout << "Cannot initialize server. Exit." << endl;
 	}
-	delete server;
+
+	cout << "Usage: IRCServer <address> <port>" << endl;
 }
 
 

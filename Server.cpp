@@ -7,8 +7,9 @@
 
 #include "Server.h"
 
-Server::Server(int port) {
+Server::Server(string address, int port) {
 	serverName = "IRCServer";
+	serverHost = address;
 	motd.push_back("hello");
 	this->serverAddress.sin_port = htons(port);
 	this->socketLength = sizeof(serverAddress);
@@ -50,7 +51,6 @@ bool Server::acceptClient() {
 		args->server = this;
 		args->client = client;
 		pthread_create(&client->thread, NULL, handleClient, (void*) args);
-//		pthread_join(*handlingClient, NULL);
 	}
 	return true;
 
@@ -64,7 +64,6 @@ void* Server::acceptingClientsLoop(void* arg) {
 
 void Server::startAcceptingClients() {
 	pthread_create(&acceptingClients, NULL, acceptingClientsLoop, this);
-//	pthread_join(acceptingClients, NULL);
 }
 
 void* Server::handleClient(void* arg) {
@@ -99,6 +98,7 @@ void* Server::handleClient(void* arg) {
 	}
 
 	delete pair;
+	delete client;
 	return NULL;
 }
 
@@ -172,7 +172,7 @@ bool Server::partChannel(const string& name, Client* client) {
 
 const string Server::getPrefix(const string & code, Client* client) const {
 	stringstream ss;
-	ss << ":" << this->serverAddress.sin_addr.s_addr << " " << code << " " << client->getNick() << " ";
+	ss << ":" << serverHost << " " << code << " " << client->getNick() << " ";
 	return ss.str();
 }
 
@@ -181,8 +181,8 @@ void Server::quitClient(Client * client) {
 		it->second->removeClient(client);
 	}
 	clients.erase(client->getNick());
-	delete client;
-	pthread_exit(0);
+	close(client->socketDescriptor);
+
 }
 
 bool Server::sendToChannel(const string & name, int exceptingClientDescriptor,

@@ -11,6 +11,7 @@ Client::Client() {
 }
 
 Client::~Client() {
+
 }
 
 Client& Client::operator =(const Client& client) {

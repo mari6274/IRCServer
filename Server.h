@@ -11,7 +11,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <fcntl.h>
+#include <netdb.h>
 #include <unistd.h>
 #include <map>
 #include <list>
@@ -46,6 +46,7 @@ private:
 	map<string, Client*> clients;
 
 	string serverName;
+	string serverHost;
 	list<string> motd;
 
 	pthread_t acceptingClients;
@@ -62,7 +63,7 @@ private:
 
 	const string getPrefix(const string & code, Client * client) const;
 public:
-	Server(int port);
+	Server(string address, int port);
 	virtual ~Server();
 
 	bool isInitializedSocket() const {

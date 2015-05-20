@@ -9,6 +9,7 @@
 #define CLIENT_H_
 
 #include <sys/socket.h>
+#include <unistd.h>
 #include <netinet/in.h>
 #include <pthread.h>
 #include <string>
@@ -30,6 +31,8 @@ public:
 	socklen_t socketLength;
 	int socketDescriptor;
 	pthread_t thread;
+
+	bool runningFlag = true;
 
 	Client();
 	virtual ~Client();

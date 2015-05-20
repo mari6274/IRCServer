@@ -223,10 +223,13 @@ void IrcProtocolParser::parseNickUser(const string& command) {
 				if (v[4][0] == ':') {
 					for (int i = 5; i < v.size(); ++i) {
 						v[4] += " " + v[i];
+						client->setRealname(v[4].substr(1, v[4].size()-1));
 					}
+				} else {
+					client->setRealname(v[4]);
 				}
 				client->setUsername(v[1]);
-				client->setRealname(v[4].substr(1, v[4].size()-1));
+
 			} else {
 				server->sendToClient(client->socketDescriptor, server->getPrefix("461", client) + "USER :Not enough parameters");
 			}
