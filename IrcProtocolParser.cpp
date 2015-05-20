@@ -35,8 +35,17 @@ void IrcProtocolParser::parse(const string & command) {
 					server->sendToChannel(v[i], client->socketDescriptor, client->getPrefix() + "JOIN " + v[i]);
 					server->sendToClient(client->getNick(), client->getPrefix() + "JOIN " + v[i]);
 					server->sendToClient(client->getNick(), server->getPrefix("332", client) + v[i] + " :" + server->channels[v[i]]->getTopic());
+					//names
+					Channel * channel = server->channels.find(v[i])->second;
+					string users;
+					for (map<string, Client*>::iterator it = channel->getClients().begin(); it != channel->getClients().end(); ++it) {
+						users += it->second->getNick() + " ";
+					}
+					server->sendToClient(client->socketDescriptor, server->getPrefix("353", client) + "= " + channel->getName() + " :" + users);
+					server->sendToClient(client->socketDescriptor, server->getPrefix("366", client) + v[1] + " :End of /NAMES");
+					//names
 				}
-				return;
+
 			} else {
 				server->sendToClient(client->socketDescriptor, server->getPrefix("461", client) + "JOIN :Not enough parameters");
 				return;
