@@ -30,8 +30,8 @@ void IrcProtocolParser::parse(const string & command) {
 					if (!server->joinChannel(v[i], client)) {
 						server->createChannel(v[i], "");
 						server->joinChannel(v[i], client);
-						client->addChannel(v[i]);
 					}
+					client->addChannel(v[i]);
 					server->sendToChannel(v[i], client->socketDescriptor, client->getPrefix() + "JOIN " + v[i]);
 					server->sendToClient(client->getNick(), client->getPrefix() + "JOIN " + v[i]);
 					server->sendToClient(client->getNick(), server->getPrefix("332", client) + v[i] + " :" + server->channels[v[i]]->getTopic());
@@ -183,7 +183,7 @@ void IrcProtocolParser::parse(const string & command) {
 		}
 
 		if (lowerCase(v[0]) == "quit") {
-			list<string> channels;
+			list<string> channels = client->getChannels();
 			for (list<string>::iterator it = channels.begin(); it != channels.end(); ++it) {
 				server->sendToChannel(*it, client->socketDescriptor, client->getPrefix() + "QUIT :Client Quit");
 			}
@@ -223,8 +223,8 @@ void IrcProtocolParser::parseNickUser(const string& command) {
 				if (v[4][0] == ':') {
 					for (int i = 5; i < v.size(); ++i) {
 						v[4] += " " + v[i];
-						client->setRealname(v[4].substr(1, v[4].size()-1));
 					}
+					client->setRealname(v[4].substr(1, v[4].size()-1));
 				} else {
 					client->setRealname(v[4]);
 				}

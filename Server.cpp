@@ -130,6 +130,7 @@ void Server::stopHandlingClient(Client* client) {
 	for (map<string, Channel *>::iterator it = channels.begin() ; it != channels.end(); ++it) {
 		it->second->removeClient(client);
 	}
+	close(client->socketDescriptor);
 	clients.erase(client->getNick());
 	pthread_kill(client->thread, SIGKILL);
 	delete client;
