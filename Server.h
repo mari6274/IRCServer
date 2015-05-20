@@ -58,6 +58,7 @@ private:
 	bool partChannel(const string & name, Client * client);
 	bool acceptClient();
 	string receiveFromClient(int clientDescriptor) const;
+	void quitClient(Client * client);
 
 	const string getPrefix(const string & code, Client * client) const;
 public:

@@ -181,7 +181,7 @@ void IrcProtocolParser::parse(const string & command) {
 		}
 
 		if (lowerCase(v[0]) == "quit") {
-			server->stopHandlingClient(client);
+			server->quitClient(client);
 			return;
 		}
 	}

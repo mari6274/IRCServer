@@ -173,6 +173,15 @@ const string Server::getPrefix(const string & code, Client* client) const {
 	return ss.str();
 }
 
+void Server::quitClient(Client * client) {
+	for (map<string, Channel *>::iterator it = channels.begin() ; it != channels.end(); ++it) {
+		it->second->removeClient(client);
+	}
+	clients.erase(client->getNick());
+	delete client;
+	pthread_exit(0);
+}
+
 bool Server::sendToChannel(const string & name, int exceptingClientDescriptor,
 		const string& message) const {
 	if (channels.find(name) != channels.end()) {
