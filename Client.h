@@ -12,8 +12,10 @@
 #include <netinet/in.h>
 #include <pthread.h>
 #include <string>
+#include <list>
 
 using std::string;
+using std::list;
 
 class Client {
 private:
@@ -21,6 +23,8 @@ private:
 	string username;
 	string realname;
 	string hostname;
+
+	list<string> channels;
 public:
 	sockaddr_in clientAddress;
 	socklen_t socketLength;
@@ -29,6 +33,11 @@ public:
 
 	Client();
 	virtual ~Client();
+
+	void addChannel(string name);
+	void removeChannel(string name);
+
+	const list<string> & getChannels() const { return channels; }
 
 	Client & operator=(const Client & client);
 

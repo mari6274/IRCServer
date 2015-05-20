@@ -21,6 +21,14 @@ Client& Client::operator =(const Client& client) {
 	return *this;
 }
 
+void Client::addChannel(string name) {
+	channels.push_back(name);
+}
+
+void Client::removeChannel(string name) {
+	channels.remove(name);
+}
+
 string Client::getPrefix() const {
 	return ":" + nick + "!" + username + "@" + hostname + " ";
 }

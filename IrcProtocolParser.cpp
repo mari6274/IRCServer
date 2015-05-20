@@ -30,6 +30,7 @@ void IrcProtocolParser::parse(const string & command) {
 					if (!server->joinChannel(v[i], client)) {
 						server->createChannel(v[i], "");
 						server->joinChannel(v[i], client);
+						client->addChannel(v[i]);
 					}
 					server->sendToChannel(v[i], client->socketDescriptor, client->getPrefix() + "JOIN " + v[i]);
 					server->sendToClient(client->getNick(), client->getPrefix() + "JOIN " + v[i]);
@@ -71,6 +72,7 @@ void IrcProtocolParser::parse(const string & command) {
 					if (server->partChannel(v[i], client)) {
 						server->sendToChannel(v[i], client->socketDescriptor, client->getPrefix() + "PART " + v[i]);
 						server->sendToClient(client->getNick(), client->getPrefix() + "PART " + v[i]);
+						client->removeChannel(v[i]);
 					} else {
 						server->sendToClient(client->getNick(), server->getPrefix("442", client) + v[i] + " :You're not on that channel");
 					}
@@ -181,6 +183,10 @@ void IrcProtocolParser::parse(const string & command) {
 		}
 
 		if (lowerCase(v[0]) == "quit") {
+			list<string> channels;
+			for (list<string>::iterator it = channels.begin(); it != channels.end(); ++it) {
+				server->sendToChannel(*it, client->socketDescriptor, client->getPrefix() + "QUIT :Client Quit");
+			}
 			server->quitClient(client);
 			return;
 		}

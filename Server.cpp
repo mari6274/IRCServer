@@ -36,12 +36,15 @@ Server::~Server() {
 bool Server::acceptClient() {
 	Client * client = new Client();
 	client->setNick("*");
-	int desc = accept(serverSocketDescriptor, (sockaddr*) &client->clientAddress, &client->socketLength);
+	sockaddr_in addr;
+	client->socketLength = sizeof (addr);
+	int desc = accept(serverSocketDescriptor, (sockaddr*) &addr, &client->socketLength);
 	if (-1 == desc) {
 		delete client;
 		return false;
 	} else if (desc > 0) {
 		client->socketDescriptor = desc;
+		client->clientAddress = addr;
 		client->setHostname(inet_ntoa(client->clientAddress.sin_addr));
 		ServerClientPair * args = new ServerClientPair();
 		args->server = this;
