@@ -33,20 +33,20 @@ int main(int argc, char **argv) {
 			server = new Server(argv[1], port);
 			if (server->isInitializedSocket()) {
 				signal(SIGINT, sigint);
-				cout << "Socket initialized" << endl;
+				cout << "Server is running on " << argv[1] << ":" << port << endl;
+				cout << "Quit the server with CONTROL-C" << endl;
 
 				server->createChannel("#SIK", "Kanał uczestników zajęć z Sieci Komputerowych.");
 
 				server->startAcceptingClients();
 				string in;
-				while (in != "q") {
-					cout << " >>> ";
+				while (true) {
 					cin >> in;
 				}
 			} else {
 				cout << "Cannot initialize server. Exit." << endl;
 			}
-			delete server;
+			sigint(0);
 			return 0;
 		}
 	}
