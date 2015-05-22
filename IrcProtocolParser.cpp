@@ -88,7 +88,7 @@ void IrcProtocolParser::parse(const string & command) {
 				}
 				return;
 			} else {
-				server->sendToClient(client->socketDescriptor, server->getPrefix("461", client) + "JOIN :Not enough parameters");
+				server->sendToClient(client->socketDescriptor, server->getPrefix("461", client) + "PART :Not enough parameters");
 				return;
 			}
 		}
